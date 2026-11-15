@@ -1,6 +1,6 @@
 #include "Platform/CendricLinux.h"
 
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
 
 #include <cstdlib>
 #include <sys/stat.h>
