@@ -31,6 +31,9 @@ int main(int argc, char* argv[]) {
 		ShowWindow(hWnd, SW_HIDE);
 	#endif
 #endif
+#ifdef __ANDROID__
+	initAndroidAssets(g_resourcePath, g_documentsPath);
+#endif
 	g_logger = new Logger();
 
 #ifdef EXTERNAL_DOCUMENTS_FOLDER
