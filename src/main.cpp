@@ -31,9 +31,11 @@ int main(int argc, char* argv[]) {
 		ShowWindow(hWnd, SW_HIDE);
 	#endif
 #endif
+
 #ifdef __ANDROID__
 	initAndroidAssets(g_resourcePath, g_documentsPath);
 #endif
+
 	g_logger = new Logger();
 
 #ifdef EXTERNAL_DOCUMENTS_FOLDER
@@ -49,7 +51,7 @@ int main(int argc, char* argv[]) {
 		#endif
 	#endif
 #endif
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
 	#ifdef USE_SYSTEM_PATHS
 		g_resourcePath = getSystemResourcePath();
 	#endif
