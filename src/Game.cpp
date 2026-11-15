@@ -6,6 +6,9 @@
 #endif
 
 #define CAPTION "Cendric"
+#ifdef __ANDROID__
+static bool s_androidHasFocus = true;
+#endif
 
 sf::RenderTexture* g_renderTexture;
 
