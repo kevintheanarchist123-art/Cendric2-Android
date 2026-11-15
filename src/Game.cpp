@@ -6,6 +6,7 @@
 #endif
 
 #define CAPTION "Cendric"
+
 #ifdef __ANDROID__
 static bool s_androidHasFocus = true;
 #endif
@@ -27,6 +28,13 @@ Game::~Game() {
 }
 
 void Game::reloadWindow() {
+#ifdef __ANDROID__
+	auto const videoMode = sf::VideoMode::getDesktopMode();
+	auto const scale = sf::Vector2f(videoMode.size.x / static_cast<float>(WINDOW_WIDTH), videoMode.size.y / static_cast<float>(WINDOW_HEIGHT));
+
+	m_mainSprite->setScale(scale);
+	m_mainWindow.create(videoMode, CAPTION, sf::State::Fullscreen);
+#else
 	auto const displayMode = g_resourceManager->getConfiguration().displayMode;
 	auto const windowMode = sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT});
 	auto const videoMode = displayMode == DisplayMode::Window ? windowMode : sf::VideoMode::getDesktopMode();
@@ -44,6 +52,7 @@ void Game::reloadWindow() {
 	default:
 		m_mainWindow.create(videoMode, CAPTION);
 	}
+#endif
 
 	auto& conf = g_resourceManager->getConfiguration();
 
@@ -73,6 +82,12 @@ void Game::run() {
 		pollEvents();
 
 		frameClock.restart();
+#ifdef __ANDROID__
+		if (!s_androidHasFocus) {
+			sf::sleep(sf::milliseconds(16));
+			continue;
+		}
+#endif
 		if (deltaTime.asSeconds() > MAX_FRAME_TIME) {
 			frameTime = sf::seconds(MAX_FRAME_TIME);
 			g_logger->logInfo("Game Loop", "Frame time just exceeded max frame time (" + std::to_string(MAX_FRAME_TIME) + "s). Its time was (ms): " + std::to_string(deltaTime.asMilliseconds()));
@@ -120,6 +135,14 @@ void Game::pollEvents() {
 		if (event->is<sf::Event::Closed>()) {
 			m_screenManager->requestQuit();
 		}
+#ifdef __ANDROID__
+		else if (event->is<sf::Event::FocusLost>()) {
+			s_androidHasFocus = false;
+		}
+		else if (event->is<sf::Event::FocusGained>()) {
+			s_androidHasFocus = true;
+		}
+#endif
 		else if (const auto* resized = event->getIf<sf::Event::Resized>()) {
 			g_inputController->setCurrentWindowSize(resized->size.x, resized->size.y);
 		}
