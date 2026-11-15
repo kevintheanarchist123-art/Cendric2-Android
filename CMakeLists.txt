@@ -64,7 +64,7 @@ endif()
 
 # enable modern c++ on clang or gcc
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT ANDROID)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
     endif()
 
@@ -129,6 +129,9 @@ elseif (APPLE)
     target_include_directories(CendricApple PRIVATE "${PROJECT_SOURCE_DIR}/include")
     set_target_properties(CendricApple PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     target_link_libraries(Cendric CendricApple "-framework Cocoa" "-framework Foundation")
+elseif (ANDROID)
+    add_library(Cendric SHARED ${Cendric_FILES})
+    target_link_libraries(Cendric SFML::Main android log)
 else()
     add_executable(Cendric ${Cendric_FILES})
 
@@ -146,7 +149,9 @@ if (CENDRIC_GERMAN)
     add_definitions("-DGERMAN_DEFAULT_LANGUAGE")
 endif()
 
-set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread -ldl")
+if (NOT ANDROID)
+    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread -ldl")
+endif()
 
 target_link_libraries(Cendric SFML::Graphics SFML::Window SFML::Audio SFML::System)
 
@@ -162,7 +167,7 @@ if (NOT USE_SYSTEM_SFML)
 endif()
 
 # Find LibGamerzilla library
-if (NOT APPLE)
+if (NOT APPLE AND NOT ANDROID)
     include(FindPkgConfig)
     pkg_search_module(GAMERZILLA OPTIONAL gamerzilla)
 
@@ -225,7 +230,7 @@ if (APPLE)
     install(TARGETS Cendric BUNDLE DESTINATION .)
     install(TARGETS sfml-graphics sfml-window sfml-audio sfml-system FRAMEWORK DESTINATION ./Cendric.app/Contents/Frameworks)
     install(DIRECTORY ${FREETYPE_LIBRARY} ${FLAC_LIBRARY} ${VORBISENC_LIBRARY} ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY} DESTINATION ./Cendric.app/Contents/Frameworks)
-else()
+elseif (NOT ANDROID)
     set(RESDIR "share/Cendric" CACHE STRING "Directory Game Ressources are installed to")
     set(BINDIR "bin" CACHE STRING "Directory Game Binary is installed to")
 
