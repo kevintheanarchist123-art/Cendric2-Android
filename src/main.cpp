@@ -13,6 +13,8 @@
 #include "Platform/CendricWin32.h"
 #elif __APPLE__
 #include "Platform/CendricApple.h"
+#elif __ANDROID__
+#include "Platform/CendricAndroid.h"
 #elif __linux__
 #include "Platform/CendricLinux.h"
 #endif
