@@ -29,11 +29,8 @@ jobs:
           echo "ANDROID_CMAKE_VERSION=${CMAKE_PKG#cmake;}" >> $GITHUB_ENV
           yes | $SDKMANAGER "platforms;android-35" "build-tools;35.0.0" "ndk;26.3.11579264" "$CMAKE_PKG"
 
-      - name: Package OpenAL and game assets for APK
+      - name: Package game assets for APK
         run: |
-          mkdir -p android/app/src/main/jniLibs/arm64-v8a
-          cp ext/sfml/extlibs/libs-android/arm64-v8a/libopenal.so android/app/src/main/jniLibs/arm64-v8a/
-
           mkdir -p android/app/src/main/assets
           cp -r db res android/app/src/main/assets/
           (cd android/app/src/main/assets && find db res -type f | sort) > android/app/src/main/assets/asset_manifest.txt
